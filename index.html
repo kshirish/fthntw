@@ -31,7 +31,10 @@
 					<ul class="collection with-header" ng-repeat="item in items | filter : { genre : selectedGenre }">
 				        <li class="collection-header"><h4>{{item.genre}}</h4></li>
 				        <li class="collection-item" ng-repeat="film in item.films">
-				        	<p><input type="checkbox" id="{{$index}}"/><label for="{{$index}}">{{film}}</label></p>
+				        	<p>
+				        		<input type="checkbox" ng-model="film.ischecked" id="{{$index}}"/>
+				        		<label for="{{$index}}" ng-click="filmClick(film)">{{film.value}}</label>
+				        	</p>
 				        </li>
 				    </ul>
 				</div>
@@ -49,6 +52,7 @@
 
 			function setLocal(key, arr) {
 				localStorage.setItem(key, JSON.stringify(arr));
+				return arr;
 			}
 
 			var watched = getLocal('watched'); 
@@ -56,30 +60,33 @@
 			angular.module('fthntw', [])
 				.controller('PageController', ['$scope', function($scope) {
 					
+					var i, j;
+
 					$scope.selectedGenre = 'All';
 
 					$scope.items = [{
 						genre: 'All',
 						films: [
-							'American History X',
-							'Detachment',
-							'Stuart - A Life Backwards',
-							'Blue',
-							'Red',
-							'White',
-							'The Pianist',
-							'Warrior'
+							{value: 'American History X'},
+							{value: 'Detachment'},
+							{value: 'Stuart - A Life Backwards'},
+							{value: 'Blue'},
+							{value: 'Red'},
+							{value: 'White'},
+							{value: 'The Pianist'},
+							{value: 'Warrior'}
 						]
 					}, {
 						genre: 'Drama',
 						films: [													
-							'American History X',
-							'Detachment',
-							'Blue',
-							'Red',
-							'White',
-							'The Pianist',
-							'Warrior'	
+							{value: 'American History X'},
+							{value: 'Detachment'},
+							{value: 'Stuart - A Life Backwards'},
+							{value: 'Blue'},
+							{value: 'Red'},
+							{value: 'White'},
+							{value: 'The Pianist'},
+							{value: 'Warrior'}
 						]
 					}, {
 						genre: 'Romance',
@@ -87,8 +94,8 @@
 					}, {
 						genre: 'Biography',
 						films: [
-							'Stuart - A Life Backwards',
-							'The Pianist'
+							{value: 'Stuart - A Life Backwards'},
+							{value: 'The Pianist'}
 						]
 					}, {
 						genre: 'Thriller',
@@ -96,10 +103,30 @@
 					}, {
 						genre: 'Documentry',
 						films: []
-					}];
+					}];					
+
+					for (i = 0; i < $scope.items.length; i++) {
+						
+						for (j = 0; j < $scope.items[i].films.length; j++) {
+
+							if(watched.indexOf($scope.items[i].films[j].value) !== -1)
+								$scope.items[i].films[j].ischecked = true;
+						}
+					}
 
 					$scope.genreClick = function(genre) {
 						$scope.selectedGenre = genre;
+					};
+
+					$scope.filmClick = function(film) {
+
+						if(film.ischecked)						
+							watched = watched.filter(function(item) {return item !== film.value});						
+						else						
+							if(watched.indexOf(film) === -1)
+								watched.push(film.value);		
+
+						setLocal('watched', watched);	
 					};
 				}]);
 		</script>
